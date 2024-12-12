@@ -13,19 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Collections {
-  id          Int     @id @default(autoincrement())
-  title       String
+model Collection {
+  id          Int       @id @default(autoincrement())
+  title       String    @unique
   description String?
   color       String
+  Request     Request[]
 }
 
-model Requests {
-  id          Int     @id @default(autoincrement())
-  title       String
-  description String?
-  url         String
-  headers     String
-  method      String
-  body        String
+model Request {
+  id           Int        @id @default(autoincrement())
+  title        String     @unique
+  description  String?
+  url          String
+  headers      String
+  method       String
+  body         String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId Int
 }

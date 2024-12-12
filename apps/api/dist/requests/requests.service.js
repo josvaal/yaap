@@ -6,19 +6,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.RequestsService = void 0;
 const common_1 = require("@nestjs/common");
-const collections_module_1 = require("./collections/collections.module");
-const prisma_service_1 = require("./prisma/prisma.service");
-const requests_module_1 = require("./requests/requests.module");
-let AppModule = class AppModule {
+let RequestsService = class RequestsService {
+    create(createRequestDto) {
+        return 'This action adds a new request';
+    }
+    findAll() {
+        return `This action returns all requests`;
+    }
+    findOne(id) {
+        return `This action returns a #${id} request`;
+    }
+    update(id, updateRequestDto) {
+        return `This action updates a #${id} request`;
+    }
+    remove(id) {
+        return `This action removes a #${id} request`;
+    }
 };
-exports.AppModule = AppModule;
-exports.AppModule = AppModule = __decorate([
-    (0, common_1.Module)({
-        imports: [collections_module_1.CollectionsModule, requests_module_1.RequestsModule],
-        controllers: [],
-        providers: [prisma_service_1.PrismaService],
-    })
-], AppModule);
-//# sourceMappingURL=app.module.js.map
+exports.RequestsService = RequestsService;
+exports.RequestsService = RequestsService = __decorate([
+    (0, common_1.Injectable)()
+], RequestsService);
+//# sourceMappingURL=requests.service.js.map

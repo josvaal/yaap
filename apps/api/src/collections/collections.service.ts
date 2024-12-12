@@ -1,26 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CollectionsService {
-  create(createCollectionDto: CreateCollectionDto) {
-    return 'This action adds a new collection';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createCollectionDto: CreateCollectionDto) {
+    try {
+      return await this.prisma.collection.create({
+        data: createCollectionDto,
+      });
+    } catch (error) {
+      console.log({ error });
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        console.log(error.code);
+        if (error.code === 'P2002') {
+          throw new ConflictException(
+            'Collection with this title already exists',
+          );
+        }
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
   }
 
   findAll() {
-    return `This action returns all collections`;
+    return this.prisma.collection.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} collection`;
+  async findOne(id: number) {
+    const collectionFound = await this.prisma.collection.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!collectionFound) {
+      throw new NotFoundException(`Collection #${id} not found`);
+    }
+
+    return collectionFound;
   }
 
-  update(id: number, updateCollectionDto: UpdateCollectionDto) {
-    return `This action updates a #${id} collection`;
+  async update(id: number, updateCollectionDto: UpdateCollectionDto) {
+    const collectionFound = await this.prisma.collection.update({
+      where: {
+        id,
+      },
+      data: updateCollectionDto,
+    });
+
+    if (!collectionFound) {
+      throw new NotFoundException(`Collection #${id} not found`);
+    }
+
+    return collectionFound;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} collection`;
+  async remove(id: number) {
+    const deletedCollection = await this.prisma.collection.delete({
+      where: {
+        id,
+      },
+    });
+    if (!deletedCollection) {
+      throw new NotFoundException(`Collection #${id} not found`);
+    }
   }
 }
